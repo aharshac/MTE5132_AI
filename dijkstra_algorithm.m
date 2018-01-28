@@ -21,6 +21,7 @@ COLOR_DESTINATION    = 6;    % yellow
 COLOR_PATH           = 7;    % grey
 
 % constants
+CLEAR = 0;
 OBSTACLE = 1;
 VISITED = 1;
 
@@ -50,10 +51,10 @@ end
 
 % Define plot
 img = zeros(N);  
-img(graph == 0)     = COLOR_CLEAR;                  % Mark free cells
-img(graph == 1)     = COLOR_OBSTACLE;               % Mark obstacle cells
-img(indexStartNode) = COLOR_START;                  % Mark start
-img(indexEndNode)   = COLOR_DESTINATION;            % Mark end
+img(graph == CLEAR)    = COLOR_CLEAR;                  % Mark free cells
+img(graph == OBSTACLE) = COLOR_OBSTACLE;               % Mark obstacle cells
+img(indexStartNode)    = COLOR_START;                  % Mark start
+img(indexEndNode)      = COLOR_DESTINATION;            % Mark end
 
 % Draw initial plot
 figure(1);
@@ -92,42 +93,42 @@ while true
     visited(i, j) = 1; % mark min cell as visited
 
     % matrix of cells adjacent to min cell
-    % each row is a co-ordinate to one adjacent cell
+    % each row is a co-ordinate (row, col) to one adjacent cell
     adjacent = [
-        i-1, j;  % N
-        i, j+1;  % E
-        i, j-1;  % W
-        i+1, j;  % S
+        i-1, j;  % Above
+        i, j+1;  % Right
+        i, j-1;  % Left
+        i+1, j;  % Below
     ];
 
-    % iterate through each co-ordinate in adjacent cell
+    % iterate through each row (co-ordinate of cell) in adjacent cell matrix
     for u = 1:4
         % co-ordinate of current adjacent cell
         p = adjacent(u, 1);       
         q = adjacent(u, 2);
 
-        % check if all adjacent cell are withing the graph AND are not obstacles
+        % check if all adjacent cell are within the graph AND are not obstacles
         if (p > 0 && p <= N && q > 0 && q <= N) && (graph(p,q) ~= OBSTACLE)
             % if adjacent cell is not visited AND distance to adjacent cell > min cell
             if (visited(p,q) ~= VISITED && distance(p,q) > distance(i,j))
-                    distance(p,q) = distance(i,j) + 1;  % increment distance of adjacent cell to min cell + 1
-                    parent(p,q) = indexMinCell;         % set min cell as parent of adjacent cell
-                    
-                    % if adjacent cell is of visitable type, i.e, not obstacle, start, end, etc.
-                    if (img(p,q) == COLOR_CLEAR) 
-                        img(p,q) = COLOR_VISITED;   % color adjacent cell as visited in image
-                    end
+                distance(p,q) = distance(i,j) + 1;  % increment distance of adjacent cell to min cell + 1
+                parent(p,q) = indexMinCell;         % set min cell as parent of adjacent cell
+
+                % if adjacent cell is of visitable type, i.e, not obstacle, start, end, etc.
+                if (img(p,q) == COLOR_CLEAR) 
+                    img(p,q) = COLOR_VISITED;   % color adjacent cell as visited in image
+                end
             end
         end
     end
     
-    % mark min cell as visited in distance matrix by setting to infinity
+    % mark current min cell from distance matrix by setting to infinity
     distance(i,j) = Inf;
 end
 
 % Plot path to destination
 if (isinf(distance(indexEndNode)))
-    % min distance to destination node is infinity, i.e, path not found
+    % min distance to destination node from start node is infinity, i.e, path not found
     path = [];
     title("No path found");
 else   
@@ -145,6 +146,10 @@ else
         axis image;
         pause(0.1);
     end
+    
+    title("FINISH");
+    
+% -- OLDER PATH PAINTING SNIPPET --
 
 %     form path by adding index of parent node successively from destination to start
 %     parent node is pushed to beginning of current path, not end
@@ -167,5 +172,4 @@ else
 %         axis image;
 %         pause(0.1);
 %     end
-    title("FINISH");
 end
