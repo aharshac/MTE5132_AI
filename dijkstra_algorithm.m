@@ -115,7 +115,7 @@ while true
                     
                     % if adjacent cell is of visitable type, i.e, not obstacle, start, end, etc.
                     if (img(p,q) == COLOR_CLEAR) 
-                        img(p,q) = COLOR_VISITED;   % mark adjacent cell as visited in image
+                        img(p,q) = COLOR_VISITED;   % color adjacent cell as visited in image
                     end
             end
         end
@@ -130,22 +130,14 @@ if (isinf(distance(indexEndNode)))
     % min distance to destination node is infinity, i.e, path not found
     path = [];
     title("No path found");
-else
-    % form path by adding index of parent node successively from destination to start
-    % parent node is pushed to beginning of current path, not end
-    % path is a row vector whose no. of columns keep increasing when successive parents are added
+else   
+    % trace path from destination to start
+    indexCurrent = indexEndNode;    % set destination as current node
     
-    path = indexEndNode;    % start path from destination node
-    
-    % while first node in path has a parent
-    while (parent(path(1)))
-        % push the parent to beginning of current path
-        path = [parent(path(1)), path];
-    end
-    
-    % draw path vector by iteration, exluding start (first) and destination (last)
-    for k = 2:length(path) - 1        
-        img(path(k)) = COLOR_PATH;
+    % loop until parent of current index node is not start node
+    while (parent(indexCurrent) ~= indexStartNode) 
+        indexCurrent = parent(indexCurrent);    % update parent as current
+        img(indexCurrent) = COLOR_PATH;         % color path cell in image
         colormap(CellColorMap);
         image(1.5, 1.5, img);
         title("Drawing path from Start to End nodes...");
@@ -153,5 +145,27 @@ else
         axis image;
         pause(0.1);
     end
+
+%     form path by adding index of parent node successively from destination to start
+%     parent node is pushed to beginning of current path, not end
+%     path is a row vector whose no. of columns keep increasing when successive parents are added    
+%     path = indexEndNode;    % start path from destination node
+%     
+%     % while first node in path has a parent
+%     while (parent(path(1)))
+%         % push the parent to beginning of current path
+%         path = [parent(path(1)), path];
+%     end
+%     
+%     % draw path vector by iteration, exluding start (first) and destination (last)
+%     for k = 2:length(path) - 1        
+%         img(path(k)) = COLOR_PATH;
+%         colormap(CellColorMap);
+%         image(1.5, 1.5, img);
+%         title("Drawing path from Start to End nodes...");
+%         grid on;
+%         axis image;
+%         pause(0.1);
+%     end
     title("FINISH");
 end
